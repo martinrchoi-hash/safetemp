@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>SafeTemp</title>
+  <meta name="description" content="Your personal danger level for today's weather: heat, cold, sun, air, wind, rain, snow and storms.">
+  <meta name="theme-color" content="#2f7fd6">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <a class="wordmark" href="./"><img class="logo-mark" src="icon.svg" alt="" width="34" height="34">Safe<em>Temp</em></a>
+      <p class="masthead-note">Personal weather risk, checked against NWS, CDC and EPA guidance.</p>
+    </div>
+  </header>
+
+  <main class="layout">
+    <div class="col-main">
+      <!-- Who and where -->
+      <section class="panel setup" aria-labelledby="setup-title">
+        <h2 id="setup-title" class="eyebrow">Who and where</h2>
+
+        <!-- Saved people: pick who to check for -->
+        <div id="whoSummary" class="field who-summary" hidden>
+          <span class="field-label">Checking for</span>
+          <div id="peopleList" class="people" hidden></div>
+          <p class="place"><span id="whoName"></span></p>
+          <p id="whoIdentity" class="who-identity"></p>
+          <div class="loc-links">
+            <button id="whoChange" class="link" type="button">Edit</button>
+            <button id="whoAdd" class="link" type="button">Add another person</button>
+          </div>
+        </div>
+
+        <!-- Adding or editing a person -->
+        <div id="whoEdit">
+          <div class="person-grid">
+            <div class="field">
+              <label for="personName">Name <span class="optional">(optional)</span></label>
+              <input id="personName" type="text" maxlength="40" placeholder="e.g. Alex, or Grandma" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="personAge">Age</label>
+              <input id="personAge" type="number" inputmode="numeric" min="0" max="120" step="1" placeholder="e.g. 34">
+            </div>
+          </div>
+          <div class="field">
+            <label for="personCondition">Health condition <span class="optional">(if any)</span></label>
+            <input id="personCondition" type="text" maxlength="200" placeholder="e.g. asthma, heart disease, diabetes. Leave blank if none" autocomplete="off">
+          </div>
+          <fieldset class="field identities">
+            <legend class="field-label">Identity <span class="optional">(pick any that apply)</span></legend>
+            <div id="types" class="id-chips">
+              <label class="id-chip"><input type="checkbox" value="outdoor"><span>Outdoor worker</span></label>
+              <label class="id-chip"><input type="checkbox" value="athlete"><span>Athlete</span></label>
+              <label class="id-chip"><input type="checkbox" value="pregnant"><span>Pregnant</span></label>
+              <label class="id-chip"><input type="checkbox" value="other"><span>Something else</span></label>
+            </div>
+          </fieldset>
+          <div id="otherBox" class="field" hidden>
+            <label for="personOther">Describe it</label>
+            <input id="personOther" type="text" maxlength="200" placeholder="e.g. I work in a kitchen, or I don't have AC" autocomplete="off">
+          </div>
+
+          <div id="assessment" class="assessment" aria-live="polite"></div>
+
+          <div class="field who-save">
+            <div class="who-buttons">
+              <button id="whoSave" class="btn" type="button">Save person</button>
+              <button id="whoCancel" class="btn btn-quiet" type="button" hidden>Cancel</button>
+              <button id="whoDelete" class="link link-danger" type="button" hidden>Delete this person</button>
+            </div>
+            <p id="whoError" class="fine error" hidden></p>
+            <p class="fine">Saved on this device, so you can pick them again any time.</p>
+          </div>
+        </div>
+
+        <div class="field location">
+          <span class="field-label">Location</span>
+          <p id="locationLabel" class="place">Finding your location…</p>
+          <p id="locationNote" class="fine location-note" hidden></p>
+          <div class="loc-links">
+            <button id="changeCity" class="link" type="button">Change city</button>
+            <button id="useMyLocation" class="link" type="button" hidden>Use my location</button>
+          </div>
+          <form id="cityForm" class="city-form" hidden>
+            <input id="cityInput" type="search" placeholder="Any city: Fresno, Tokyo, Paris…" autocomplete="off" aria-label="City name">
+            <button type="submit" class="btn">Search</button>
+            <ul id="cityResults" class="city-results"></ul>
+          </form>
+        </div>
+
+        <div class="field push" id="pushBox">
+          <span class="field-label">🔔 Alerts</span>
+          <p id="pushStatus" class="fine">Get a notification when there's an official weather alert here: power outages, fire weather, flooding, storms and more.</p>
+          <div class="loc-links">
+            <button id="pushOn" class="link" type="button">Turn on alerts</button>
+            <button id="pushTest" class="link" type="button" hidden>Send a test</button>
+            <button id="pushOff" class="link" type="button" hidden>Turn off</button>
+          </div>
+        </div>
+
+        <button id="checkButton" class="btn btn-quiet" type="button">Check again</button>
+      </section>
+
+      <!-- Results -->
+      <section class="results" aria-live="polite">
+        <!-- When: one day + time picker for the risk check, conditions and map -->
+        <div class="when-bar" aria-label="Which day and time to check">
+          <div id="whenDays" class="day-bar" role="group" aria-label="Day"></div>
+          <label class="when-time">
+            <span>Time</span>
+            <select id="whenHour" aria-label="Time of day"></select>
+          </label>
+        </div>
+
+        <!-- The chosen time's weather over an animated sky that matches it -->
+        <div id="hero" class="hero scene-clear">
+          <div class="hero-sky" aria-hidden="true">
+            <div class="sun"></div>
+            <div class="moon"></div>
+            <div class="cloud c1"></div>
+            <div class="cloud c2"></div>
+            <div class="cloud c3"></div>
+            <div class="fog f1"></div>
+            <div class="fog f2"></div>
+            <div class="flash"></div>
+            <canvas class="hero-fx"></canvas>
+          </div>
+          <div class="hero-content">
+            <p id="heroPlace" class="hero-place">&nbsp;</p>
+            <div class="hero-main">
+              <span id="heroTemp" class="hero-temp">--°</span>
+              <span id="heroIcon" class="hero-icon"></span>
+            </div>
+            <p id="heroCond" class="hero-cond">Loading the weather…</p>
+            <p id="heroMore" class="hero-more"></p>
+          </div>
+        </div>
+
+        <div id="alerts" class="alerts" hidden></div>
+
+        <!-- Heads-up: power could go out (not a risk level) -->
+        <div id="outageNotice" class="notice" role="status" hidden>
+          <span class="notice-icon" aria-hidden="true">⚡</span>
+          <div>
+            <b>Power outage possible</b>
+            <p id="outageWhy"></p>
+            <p class="notice-do">Get ready now: charge your phone and power bank, find your flashlight, and check the supplies below.</p>
+          </div>
+        </div>
+
+        <div id="verdict" class="verdict is-loading">
+          <p id="verdictWhen" class="eyebrow">Today's risk</p>
+          <h2 id="verdictLevel" class="verdict-level">Checking the weather…</h2>
+          <p id="verdictWho" class="verdict-who"></p>
+          <ul id="verdictHazards" class="verdict-hazards"></ul>
+        </div>
+
+        <div id="details" hidden>
+          <section class="panel">
+            <h2 class="eyebrow">Conditions</h2>
+            <dl id="readings" class="readings"></dl>
+          </section>
+
+          <section class="panel">
+            <h2 class="eyebrow">What to do</h2>
+            <ol id="tipsList" class="tips"></ol>
+          </section>
+
+          <section id="aiCard" class="panel ai" hidden>
+            <h2 class="eyebrow">Advice written for you</h2>
+            <ul id="aiList" class="tips plain"></ul>
+            <p id="aiStatus" class="fine"></p>
+            <p class="fine">Written by AI (Claude) from CDC and National Weather Service guidance. The risk level always comes from SafeTemp's rules, not the AI.</p>
+          </section>
+
+          <section class="panel">
+            <h2 class="eyebrow">Have what you need?</h2>
+            <p id="suppliesFor" class="fine"></p>
+            <ul id="supplies" class="supplies"></ul>
+          </section>
+
+          <section class="panel">
+            <h2 class="eyebrow">Next 7 days</h2>
+            <ol id="forecast" class="forecast"></ol>
+          </section>
+        </div>
+      </section>
+    </div>
+
+    <!-- World map -->
+    <aside class="col-map">
+      <section class="panel world">
+        <div class="world-head">
+          <h2 class="eyebrow">World map</h2>
+          <div class="map-controls">
+            <div id="mapLayers" class="map-layers" role="tablist" aria-label="What the map shows"></div>
+            <button id="mapWind" class="map-toggle" type="button" aria-pressed="false" title="Show moving gusts of wind when zoomed in">💨 Wind</button>
+          </div>
+        </div>
+        <p id="mapDescription" class="fine map-desc">Where it's safe or dangerous right now.</p>
+        <div id="worldMap" class="world-map" aria-label="World map of danger zones"></div>
+        <div id="zoneLegend" class="zone-legend" aria-label="Map legend"></div>
+        <div id="gradLegend" class="legend" aria-label="Map legend" hidden>
+          <div id="legendBar" class="legend-bar"></div>
+          <div id="legendTicks" class="legend-ticks"></div>
+          <div id="legendEnds" class="legend-ends"></div>
+        </div>
+        <div id="alertLegend" class="alert-legend" hidden></div>
+        <p id="mapStatus" class="fine">Loading the world map…</p>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>
+        <h2 class="eyebrow">Get help</h2>
+        <ul class="help-list">
+          <li><a href="tel:911">Call 911</a> if someone is confused, faints, stops sweating, has numb white skin, or can't breathe well.</li>
+          <li><a href="tel:211">Call 211</a> (free, 24/7, US) for cooling and warming centers, shelters and coat drives.</li>
+          <li><a href="https://www.csd.ca.gov/energybills" target="_blank" rel="noopener">Help paying heating and cooling bills</a> (LIHEAP).</li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="eyebrow">About the numbers</h2>
+        <p>Heat and cold use the National Weather Service heat index and wind chill charts, adjusted for groups the CDC lists as higher risk. UV follows the WHO scale, air quality the EPA AQI, wind the NWS advisory levels. Weather from Open-Meteo; US alerts from the National Weather Service.</p>
+        <p>SafeTemp gives general safety information. It doesn't replace official warnings or 911. <a href="privacy.html">Privacy</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.min.js"></script>
+  <script src="sky.js"></script>
+  <script src="app.js"></script>
+  <script src="map.js"></script>
+</body>
+</html>

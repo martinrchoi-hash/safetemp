@@ -1,0 +1,11 @@
+node_modules/
+
+# Private: never commit or share these
+push-keys.json
+push-subs.json
+
+# Cache the server rebuilds by itself
+zone-cache.json
+
+# world-cache.json is kept on purpose: on free hosting the server starts from it, so the map
+# shows right away while fresh world weather loads in the background.

@@ -1,0 +1,6 @@
+node_modules/
+.expo/
+*.log
+
+# This computer's own Claude Code settings
+/.claude/

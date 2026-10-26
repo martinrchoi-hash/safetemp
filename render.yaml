@@ -1,0 +1,26 @@
+# One-click hosting for the SafeTemp server on Render (render.com → New → Blueprint → pick this repo).
+# Free plan: it sleeps after ~15 minutes without visitors (the next visit takes about a minute to wake)
+# and forgets saved files when it sleeps, so alert notifications won't stick. Everything else works.
+# For real alerts later: change plan to starter and add the disk below (about $7–8/month).
+services:
+  - type: web
+    name: safetemp
+    runtime: node
+    plan: free
+    rootDir: web
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /healthz
+    # disk:                    # paid plans only: keeps alert subscriptions through restarts
+    #   name: safetemp-data
+    #   mountPath: /var/data
+    #   sizeGB: 1
+    envVars:
+      # - key: DATA_DIR        # with the disk above
+      #   value: /var/data
+      - key: TRUST_PROXY
+        value: "1"
+      - key: PUSH_CONTACT # e.g. mailto:you@yourdomain.com (push services need a contact)
+        sync: false
+      - key: ANTHROPIC_API_KEY # optional: turns on the AI advice card
+        sync: false

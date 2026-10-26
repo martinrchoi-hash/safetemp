@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SafeTemp Privacy</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <style>
+    :root { --ink: #172230; --muted: #45535f; --paper: #edf1f5; --panel: #fff; --accent: #2266b8; }
+    @media (prefers-color-scheme: dark) { :root { --ink: #e7edf3; --muted: #b8c4cf; --paper: #0d131a; --panel: #141c25; --accent: #6aa6f0; } }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    main { max-width: 720px; margin: 0 auto; padding: 32px 16px 64px; }
+    .card { background: var(--panel); border-radius: 12px; padding: 24px; }
+    h1 { margin-top: 0; font-size: 28px; }
+    h2 { font-size: 18px; margin: 28px 0 6px; }
+    p, li { color: var(--muted); }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="card">
+      <h1>SafeTemp privacy</h1>
+      <p>SafeTemp tells you how dangerous today's weather is for you. It has no accounts, no ads and no tracking, and it never sells data.</p>
+
+      <h2>Kept only on your phone or computer</h2>
+      <ul>
+        <li>The people you save: names, ages, health conditions and identities.</li>
+        <li>Your saved city, map settings and checklist answers.</li>
+      </ul>
+      <p>Deleting the app (or clearing the site's data) deletes these.</p>
+
+      <h2>Sent to SafeTemp's server, but not stored</h2>
+      <ul>
+        <li>A health condition or description you type, so it can be turned into sensitivity numbers.</li>
+        <li>For the optional AI advice: today's weather numbers and a short description of who it's for.</li>
+      </ul>
+      <p>If AI advice is turned on, these are passed to Anthropic (the maker of Claude) to write the advice. Names are never sent.</p>
+
+      <h2>Stored on SafeTemp's server, only if you turn on alerts</h2>
+      <ul>
+        <li>Your device's notification address, the location you're checking and its town name, so we can send official weather alerts for that place.</li>
+      </ul>
+      <p>Turning alerts off, or turning off notifications for SafeTemp, deletes these.</p>
+
+      <h2>Services SafeTemp uses</h2>
+      <p>To check the weather, your location (or a city you pick) is sent directly to these services:</p>
+      <ul>
+        <li>Open-Meteo: weather and air quality forecasts.</li>
+        <li>BigDataCloud: town names for a location, and an approximate location from your internet connection when GPS is off.</li>
+        <li>US National Weather Service: official weather alerts.</li>
+        <li>OpenFreeMap: map tiles. Google Fonts and cdnjs: fonts and the map code.</li>
+        <li>Expo, Apple and Google: delivering notifications, if you turn on alerts.</li>
+      </ul>
+
+      <h2>Not medical advice</h2>
+      <p>SafeTemp gives general safety information based on National Weather Service, CDC, EPA and WHO guidance. It doesn't replace official warnings, a doctor or 911.</p>
+
+      <h2>Questions</h2>
+      <p>Contact the developer at the email listed on SafeTemp's App Store page.</p>
+      <p><a href="./">← Back to SafeTemp</a></p>
+    </div>
+  </main>
+</body>
+</html>

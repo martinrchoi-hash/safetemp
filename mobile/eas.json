@@ -1,0 +1,27 @@
+{
+  "cli": {
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_SAFETEMP_URL": "http://192.168.1.32:5180/"
+      }
+    },
+    "preview": {
+      "extends": "production",
+      "distribution": "internal"
+    },
+    "production": {
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_SAFETEMP_URL": "https://REPLACE-WITH-YOUR-SERVER-ADDRESS/"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
