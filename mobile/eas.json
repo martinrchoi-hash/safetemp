@@ -17,7 +17,7 @@
     "production": {
       "autoIncrement": true,
       "env": {
-        "EXPO_PUBLIC_SAFETEMP_URL": "https://REPLACE-WITH-YOUR-SERVER-ADDRESS/"
+        "EXPO_PUBLIC_SAFETEMP_URL": "https://safetemp-0el9.onrender.com/"
       }
     }
   },
